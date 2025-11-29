@@ -19,7 +19,7 @@ public class BoxValidator implements Validator {
     }
 
     @Override
-    public List<ValidationError> validate() {
+    public List<ValidationError> validate() throws InterruptedException{
         List<ValidationError> out = new ArrayList<>();
         int boxIndex = 1; 
 //outer loops over boxes

@@ -22,7 +22,7 @@ public class RowValidator implements Validator {
     }
     
     @Override
-    public List<ValidationError> validate(){
+    public List<ValidationError> validate()throws InterruptedException{
         List<ValidationError> out = new ArrayList<>();// create empty list to hold any detected errors 
         
         for(int r=0; r<9; r++)

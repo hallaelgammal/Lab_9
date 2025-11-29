@@ -19,7 +19,7 @@ public class ColValidator implements Validator {
     }
 
     @Override
-    public List<ValidationError> validate() {
+    public List<ValidationError> validate()throws InterruptedException {
         List<ValidationError> out = new ArrayList<>();
         for (int c = 0; c < 9; c++) {
             Map<Integer, List<String>> pos = new HashMap<>();//list of rows where it appears in this column
