@@ -30,4 +30,21 @@ public class ValidationResult {
         out.addAll(b.getErrors());
         return out;
     }
+  
+
+    // Optional: clear all errors
+    public synchronized void clear() {
+        errors.clear();
+    }
+
+    // Optional: thread-safe string representation
+    @Override
+    public synchronized String toString() {
+        if (errors.isEmpty()) return "No validation errors.";
+        StringBuilder sb = new StringBuilder();
+        for (ValidationError e : errors) {
+            sb.append(e).append("\n");
+        }
+        return sb.toString();
+    }
 }
