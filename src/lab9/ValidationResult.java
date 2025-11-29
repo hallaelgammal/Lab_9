@@ -5,23 +5,24 @@
 package lab9;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Collections;
 /**
  *
  * @author Dell
  */
 //add & addAll & geterrors protect encapsulation
 public class ValidationResult {
-    private final List<ValidationError> errors=new ArrayList<>();//final 3shan el reference can't point to different list bs we can add and remove elements 3ady
-    public void add(ValidationError e){
+    private final List<ValidationError> errors=Collections.synchronizedList(new ArrayList<>());//final 3shan el reference can't point to different list bs we can add and remove elements 3ady
+    public synchronized void add(ValidationError e){
         errors.add(e);
     }
-    public void addAll(List<ValidationError>list){
+    public synchronized void addAll(List<ValidationError>list){
         errors.addAll(list);
     }
     public boolean isValid(){
         return errors.isEmpty();
     }
-    public List<ValidationError> getErrors(){
+    public synchronized List<ValidationError> getErrors(){
         return errors;
     }
     public static ValidationResult merge(ValidationResult a,ValidationResult b){
