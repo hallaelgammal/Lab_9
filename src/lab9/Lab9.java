@@ -3,17 +3,21 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Main.java to edit this template
  */
 package lab9;
-// Main.java  (sequential 0-mode integration)
-import java.util.List;
-
 public class Lab9 {
     public static void main(String[] args) {
+        String csv;
+        int mode;
+
+        // If no args are provided, use defaults for testing
         if (args.length < 2) {
-            System.err.println("Usage: java -jar sudoku.jar <csvfile> <mode(0|3|27)>");
-            System.exit(1);
+            System.out.println("No arguments provided. Using default test CSV and mode 0.");
+            csv = "test.csv"; // make sure this file exists in your project folder
+            mode = 0;
+        } else {
+            csv = args[0].trim();
+            mode = Integer.parseInt(args[1].trim());
         }
-        String csv = args[0];
-        int mode = Integer.parseInt(args[1]);
+
         if (mode != 0) {
             System.err.println("This run supports only mode 0 for Part 1. Use mode 0.");
             System.exit(1);
@@ -26,20 +30,15 @@ public class Lab9 {
             ValidationResult result = new ValidationResult();
 
             // sequential checks
-            List<ValidationError> rowErrs = ValidatorFactory.rowValidator(arr).validate();
-            List<ValidationError> colErrs = ValidatorFactory.colValidator(arr).validate();
-            List<ValidationError> boxErrs = ValidatorFactory.boxValidator(arr).validate();
-
-            result.addAll(rowErrs);
-            result.addAll(colErrs);
-            result.addAll(boxErrs);
+            result.addAll(ValidatorFactory.rowValidator(arr).validate());
+            result.addAll(ValidatorFactory.colValidator(arr).validate());
+            result.addAll(ValidatorFactory.boxValidator(arr).validate());
 
             // Print according to spec
             if (result.isValid()) {
                 System.out.println("VALID");
             } else {
                 System.out.println("INVALID\n");
-                // Sorting: all ROW, then COL, then BOX and by index within each type (nice deterministic order)
                 result.getErrors().stream()
                     .sorted((a,b) -> {
                         int ta = typeOrder(a.getType()), tb = typeOrder(b.getType());
@@ -47,10 +46,11 @@ public class Lab9 {
                         if (a.getIndex() != b.getIndex()) return Integer.compare(a.getIndex(), b.getIndex());
                         return Integer.compare(a.getValue(), b.getValue());
                     })
-                    .forEach(e -> System.out.println(e.toString()));
+                    .forEach(System.out::println);
             }
         } catch (Exception ex) {
             System.err.println("ERROR: " + ex.getMessage());
+            ex.printStackTrace(); // optional, helps debug
             System.exit(2);
         }
     }
@@ -64,4 +64,3 @@ public class Lab9 {
         }
     }
 }
-
