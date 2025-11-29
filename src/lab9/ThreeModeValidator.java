@@ -4,6 +4,7 @@
  */
 package lab9;
 
+import java.util.ArrayList;
 import java.util.concurrent.*;
 import java.util.List;
 
@@ -21,28 +22,35 @@ public class ThreeModeValidator implements Validator {
 
     @Override
     public List<ValidationError> validate() throws InterruptedException {
-        ValidationResult result = new ValidationResult();
         ExecutorService executor = Executors.newFixedThreadPool(3);
-        executor.submit(() -> {
-            result.addAll(new RowValidator(board.toArrayCopy()).validate());
-        });
-        executor.submit(() -> {
 
-            result.addAll(new ColValidator(board.toArrayCopy()).validate());
+        // Create tasks for row, column, and box validation
+        List<Callable<List<ValidationError>>> tasks = List.of(
+            () -> new RowValidator(board.toArrayCopy()).validate(),
+            () -> new ColValidator(board.toArrayCopy()).validate(),
+            () -> new BoxValidator(board.toArrayCopy()).validate()
+        );
 
-        });
-        executor.submit(() -> {
+        List<ValidationError> errors = new ArrayList<>();
 
-            result.addAll(new BoxValidator(board.toArrayCopy()).validate());
-
-        });
-        executor.shutdown();
         try {
-            executor.awaitTermination(5, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt(); // restore interrupt status
-            System.out.println("Executor termination interrupted");
+            // Submit all tasks and wait for them to finish
+            List<Future<List<ValidationError>>> futures = executor.invokeAll(tasks);
+
+            // Collect results from all futures
+            for (Future<List<ValidationError>> future : futures) {
+                try {
+                    errors.addAll(future.get());
+                } catch (ExecutionException e) {
+                    // Handle any exceptions thrown inside the validators
+                    e.printStackTrace();
+                }
+            }
+        } finally {
+            executor.shutdown();
         }
-        return result.getErrors();
+
+        return errors;
     }
 }
+
