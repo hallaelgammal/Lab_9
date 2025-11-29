@@ -9,5 +9,5 @@ import java.util.List;
  * @author Dell
  */
 public interface Validator {
-    List<ValidationError> validate();
+    List<ValidationError> validate() throws InterruptedException;
 }
