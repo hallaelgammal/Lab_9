@@ -4,13 +4,10 @@
  */
 package lab9;
 
-/**
- *
- * @author Gehad
- */
 import java.util.Collections;
 
 public class ValidatorThread extends Thread {
+
     private final int[][] board;
     private final int index;
     private final String type; // "row", "col", "box"
@@ -27,70 +24,66 @@ public class ValidatorThread extends Thread {
     public void run() {
         switch (type) {
             case "row":
-                validateRow(index);
+                validateRow();
                 break;
             case "col":
-                validateCol(index);
+                validateCol();
                 break;
             case "box":
-                validateBox(index);
+                validateBox();
                 break;
         }
     }
 
-    private void validateRow(int r) {
+    private void validateRow() {
         boolean[] seen = new boolean[9];
         for (int c = 0; c < 9; c++) {
-            int val = board[r][c];
-            if (val < 1 || val > 9 || seen[val - 1]) {
-                result.add(new ValidationError(
-                        ValidationError.Type.ROW,
-                        r,
-                        val,
-                        Collections.singletonList(r + "," + c)
-                ));
-                return;
-            }
-            seen[val - 1] = true;
+            checkCell(index, c, seen, ValidationError.Type.ROW);
         }
     }
 
-    private void validateCol(int c) {
+    private void validateCol() {
         boolean[] seen = new boolean[9];
         for (int r = 0; r < 9; r++) {
-            int val = board[r][c];
-            if (val < 1 || val > 9 || seen[val - 1]) {
-                result.add(new ValidationError(
-                        ValidationError.Type.COL,
-                        c,
-                        val,
-                        Collections.singletonList(r + "," + c)
-                ));
-                return;
-            }
-            seen[val - 1] = true;
+            checkCell(r, index, seen, ValidationError.Type.COL);
         }
     }
 
-    private void validateBox(int boxIndex) {
+    private void validateBox() {
         boolean[] seen = new boolean[9];
-        int startRow = (boxIndex / 3) * 3;
-        int startCol = (boxIndex % 3) * 3;
-
+        int startRow = (index / 3) * 3;
+        int startCol = (index % 3) * 3;
         for (int r = startRow; r < startRow + 3; r++) {
             for (int c = startCol; c < startCol + 3; c++) {
-                int val = board[r][c];
-                if (val < 1 || val > 9 || seen[val - 1]) {
-                    result.add(new ValidationError(
-                            ValidationError.Type.BOX,
-                            boxIndex,
-                            val,
-                            Collections.singletonList(r + "," + c)
-                    ));
-                    return;
-                }
-                seen[val - 1] = true;
+                checkCell(r, c, seen, ValidationError.Type.BOX);
             }
+        }
+    }
+
+    private void checkCell(int r, int c, boolean[] seen, ValidationError.Type typeEnum) {
+        int val = board[r][c];
+
+        // Invalid number check
+        if (val < 1 || val > 9) {
+            result.add(new ValidationError(
+                typeEnum,
+                typeEnum == ValidationError.Type.ROW ? r + 1 : typeEnum == ValidationError.Type.COL ? c + 1 : (r/3*3 + c/3 + 1),
+                val,
+                Collections.singletonList((r + 1) + "," + (c + 1))
+            ));
+            return;
+        }
+
+        // Duplicate check
+        if (seen[val - 1]) {
+            result.add(new ValidationError(
+                typeEnum,
+                typeEnum == ValidationError.Type.ROW ? r + 1 : typeEnum == ValidationError.Type.COL ? c + 1 : (r/3*3 + c/3 + 1),
+                val,
+                Collections.singletonList((r + 1) + "," + (c + 1))
+            ));
+        } else {
+            seen[val - 1] = true;
         }
     }
 }

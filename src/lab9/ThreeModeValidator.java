@@ -24,36 +24,6 @@ public class ThreeModeValidator implements Validator {
     public List<ValidationError> validate() throws InterruptedException {
         ExecutorService executor = Executors.newFixedThreadPool(3);
         ValidationResult result = new ValidationResult();
-        // Create tasks for row, column, and box validation
-//        List<Callable<List<ValidationError>>> tasks = List.of(
-//            () -> new RowValidator(board.toArrayCopy()).validate(),
-//            () -> new ColValidator(board.toArrayCopy()).validate(),
-//            () -> new BoxValidator(board.toArrayCopy()).validate()
-//        );
-//
-//        List<ValidationError> errors = new ArrayList<>();
-//
-//        try {
-//            // Submit all tasks and wait for them to finish
-//            List<Future<List<ValidationError>>> futures = executor.invokeAll(tasks);
-//
-//            // Collect results from all futures
-//            for (Future<List<ValidationError>> future : futures) {
-//                try {
-//                    errors.addAll(future.get());
-//                } catch (ExecutionException e) {
-//                    // Handle any exceptions thrown inside the validators
-//                    e.printStackTrace();
-//                }
-//            }
-//        } finally {
-//            executor.shutdown();
-//        }
-//
-//        return errors;
-
-
-    // Submit row, column, and box validators
     executor.submit(() -> {
         try {
             result.addAll(new RowValidator(board.toArrayCopy()).validate());
