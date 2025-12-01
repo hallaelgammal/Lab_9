@@ -4,74 +4,95 @@
  */
 package lab9;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Scanner;
 
 public class Lab9 {
 
     public static void main(String[] args) {
-
         Scanner sc = new Scanner(System.in);
 
         while (true) {
-            try {
+            String file;
+            int mode;
+
+            // Check CLI args for file
+            if (args.length >= 1) {
+                file = args[0];
+                if (args.length >= 2) {
+                    try {
+                        mode = Integer.parseInt(args[1]);
+                    } catch (NumberFormatException e) {
+                        System.out.println("Mode must be 0, 3, or 27");
+                        break;
+                    }
+                } else {
+                    mode = askMode(sc);
+                }
+            } else {
+                // Ask user for CSV
                 System.out.print("Enter CSV file name: ");
-                String file = sc.nextLine().trim();
+                file = sc.nextLine().trim();
+                mode = askMode(sc);
+            }
+
+            try {
                 SudokuBoard board = CSVLoader.load(file);
                 System.out.println("Sudoku Board Loaded:\n");
                 System.out.println(board);
-                System.out.println("Choose Validation Mode:");
-                System.out.println("0--Single-thread?");
-                System.out.println("3--3-thread mode?");
-                System.out.println("27--27-thread mode?");
-                System.out.print("Your choice: ");
-                int mode = sc.nextInt();
-                sc.nextLine(); // consume extra newline
+
                 Validator validator;
                 switch (mode) {
-                    case 0:
-                        validator = new SingleModeValidator(board);
-                        break;
-                    case 3:
-                        validator = new ThreeModeValidator(board);
-                        break;
-                    case 27:
-                        validator = new TwentySevenModeValidator(board);
-                        break;
+                    case 0: validator = new SingleModeValidator(board); break;
+                    case 3: validator = new ThreeModeValidator(board); break;
+                    case 27: validator = new TwentySevenModeValidator(board); break;
                     default:
-                        System.out.println("Invalid mode. Try again.");
+                        System.out.println("Invalid mode. Use 0, 3, or 27");
                         continue;
                 }
+
                 List<ValidationError> errors = validator.validate();
                 if (errors.isEmpty()) {
                     System.out.println("Sudoku board is VALID!");
                 } else {
                     System.out.println("Sudoku board has ERRORS:");
-                    for (ValidationError e : errors) {
-                        System.out.println(e);
-                    }
+                    for (ValidationError e : errors) System.out.println(e);
                 }
 
-            } catch (IOException e) {
-                System.out.println(" Error loading CSV: " + e.getMessage());
-            } catch (InterruptedException e) {
-                System.out.println(" Validation interrupted.");
-                Thread.currentThread().interrupt();
+            } catch (Exception e) {
+                System.out.println("Error: " + e.getMessage());
             }
 
-            // ----------------------------
-            // 6) Ask user to continue
-            // ----------------------------
-            System.out.print("\nDo you want to test another board? (y/n): ");
+            // Ask user to continue
+            System.out.print("\nDo you want to continue? (y/n): ");
             String again = sc.nextLine().trim().toLowerCase();
-
             if (!again.equals("y")) {
                 System.out.println("Exiting program...");
                 break;
             }
+
+            // Clear CLI args after first run
+            args = new String[0];
         }
 
         sc.close();
     }
+
+    private static int askMode(Scanner sc) {
+        int mode;
+        while (true) {
+            System.out.println("Choose Validation Mode:");
+            System.out.println("0-Single-thread?");
+            System.out.println("3-3-thread mode?");
+            System.out.println("27-27-thread mode?");
+            System.out.print("Your choice: ");
+            try {
+                mode = Integer.parseInt(sc.nextLine().trim());
+                if (mode == 0 || mode == 3 || mode == 27) break;
+            } catch (NumberFormatException ignored) {}
+            System.out.println("Invalid choice. Try again.");
+        }
+        return mode;
+    }
 }
+
