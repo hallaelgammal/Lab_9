@@ -22,7 +22,7 @@ public class ColValidator implements Validator {
     public List<ValidationError> validate()throws InterruptedException {
         List<ValidationError> out = new ArrayList<>();
         for (int c = 0; c < 9; c++) {
-            Map<Integer, List<String>> pos = new HashMap<>();//list of rows where it appears in this column
+            Map<Integer, List<String>> pos = new HashMap<>();//pos=list of rows where it appears in this column
 
             for (int r = 0; r < 9; r++) {
                 int v = board[r][c];//value inside soduku cell

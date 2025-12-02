@@ -22,13 +22,13 @@ public class ThreeModeValidator implements Validator {
 
     @Override
     public List<ValidationError> validate() throws InterruptedException {
-        ExecutorService executor = Executors.newFixedThreadPool(3);
+        ExecutorService executor = Executors.newFixedThreadPool(3);//to let the program use 3 threads 
         ValidationResult result = new ValidationResult();
-    executor.submit(() -> {
+    executor.submit(() -> {//3shan nesha8al task gededa gowa el thread pool
         try {
             result.addAll(new RowValidator(board.toArrayCopy()).validate());
         } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
+            Thread.currentThread().interrupt();//3shan law el thread et2ata3
         }
     });
 
@@ -49,9 +49,9 @@ public class ThreeModeValidator implements Validator {
     });
 
     executor.shutdown();
-    boolean finished = executor.awaitTermination(10, TimeUnit.SECONDS);
+    boolean finished = executor.awaitTermination(10, TimeUnit.SECONDS);//to wait until all threads finish max 10 sec
     if (!finished) {
-        System.err.println("Warning: Validation did not finish in time.");
+        System.err.println("Warning: Validation did not finish in time.");//warning en fi thread ma5alash 
     }
 
     return result.getErrors();
